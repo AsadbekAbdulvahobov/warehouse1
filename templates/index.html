@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Omborxona boshqaruvi</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #121212;
+            color: #e0e0e0;
+            margin: 0;
+            padding: 20px;
+        }
+        h1, h2 {
+            color: #4caf50;
+        }
+        .form {
+            margin: 20px 0;
+            background-color: #1e1e2f;
+            padding: 20px;
+            border-radius: 8px;
+            display: grid;
+            grid-template-columns: 150px 200px;
+            gap: 20px;
+            grid-template-rows: 25px 25px 40px;
+            align-content: center;
+        }
+        form {
+            margin: 20px 0;
+            background-color: #1e1e2f;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: #1e1e2f;
+        }
+        table th, table td {
+            padding: 10px;
+            border: 1px solid #3a3a4f;
+        }
+        table th {
+            background-color: #3a3a4f;
+            color: #4caf50;
+        }
+        button {
+            background-color: #4caf50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+            border-radius: 2px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <h1>Omborxona boshqaruvi</h1>
+    {% if message %}
+        <p style="color: green;">{{ message }}</p>
+    {% endif %}
+
+    <form action="/add" method="POST" class="form">
+        <label for="item">Mahsulot nomi:</label>
+        <input type="text" id="item" name="item" required>
+        <label for="quantity">Miqdori:</label>
+        <input type="number" id="quantity" name="quantity" required>
+        <button type="submit">Qo'shish</button>
+    </form>
+
+    <h2>Ombor tarkibi</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Mahsulot</th>
+                <th>Miqdori</th>
+                <th>Amallar</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item, quantity in warehouse.items() %}
+                <tr>
+                    <td>{{ item }}</td>
+                    <td>{{ quantity }}</td>
+                    <td>
+                        <a href="/edit/{{ item }}">Tahrirlash</a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+<h2>Filtrlar</h2>
+<form action="/filter" method="GET">
+    <button type="submit" name="filter" value="low">Kam sonli mahsulotlar</button>
+    <button type="submit" name="filter" value="high">Ko'p mahsulotlar</button>
+</form>
+
+{% if low_stock %}
+    <h2>Kam sonli mahsulotlar:</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Mahsulot</th>
+                <th>Miqdori</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item, quantity in low_stock.items() %}
+                <tr>
+                    <td>{{ item }}</td>
+                    <td>{{ quantity }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endif %}
+
+{% if high_stock %}
+    <h2>Ko'p mahsulotlar:</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Mahsulot</th>
+                <th>Miqdori</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item, quantity in high_stock.items() %}
+                <tr>
+                    <td>{{ item }}</td>
+                    <td>{{ quantity }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endif %}
+
+<h2>Hisobotlar</h2>
+<form action="/view_reports" method="GET">
+    <button type="submit" name="type" value="monthly">Oylik hisobot</button>
+    <button type="submit" name="type" value="total">Umumiy hisobot</button>
+</form>
+
+{% if report %}
+    <h2>Oylik hisobot:</h2>
+    <ul>
+        {% for item, logs in report.items() %}
+            <li>{{ item }}:
+                <ul>
+                    {% for log in logs %}
+                        <li>{{ log.date }} - {{ log.quantity_removed }} miqdorda olib tashlandi.</li>
+                    {% endfor %}
+                </ul>
+            </li>
+        {% endfor %}
+    </ul>
+{% endif %}
+
+{% if total_taken %}
+    <h2>Umumiy olib ketilgan mahsulotlar:</h2>
+    <ul>
+        {% for item, quantity in total_taken.items() %}
+            <li>{{ item }}: {{ quantity }} ta</li>
+        {% endfor %}
+    </ul>
+{% endif %}
+</body>
+</html>
